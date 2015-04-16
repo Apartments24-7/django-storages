@@ -261,6 +261,8 @@ class S3BotoStorage(Storage):
         if bucket is not None:
             self.bucket_name = bucket
 
+        self.encryption247 = settings.get("encryption247", False)
+
         self.location = (self.location or '').lstrip('/')
         # Backward-compatibility: given the anteriority of the SECURE_URL setting
         # we fall back to https if specified in order to avoid the construction
@@ -422,8 +424,8 @@ class S3BotoStorage(Storage):
     def _save_content(self, key, content, headers):
         # only pass backwards incompatible arguments if they vary from the default
         kwargs = {}
-        if self.encryption:
-            kwargs['encrypt_key'] = self.encryption
+        kwargs['encrypt_key'] = self.encryption or self.encryption247
+
         key.set_contents_from_file(content, headers=headers,
                                    policy=self.default_acl,
                                    reduced_redundancy=self.reduced_redundancy,
