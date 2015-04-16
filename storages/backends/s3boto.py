@@ -261,7 +261,7 @@ class S3BotoStorage(Storage):
         if bucket is not None:
             self.bucket_name = bucket
 
-        self.encryption247 = getattr(settings, "encryption247", False)
+        self.encryption247 = settings.get("encryption247", False)
 
         self.location = (self.location or '').lstrip('/')
         # Backward-compatibility: given the anteriority of the SECURE_URL setting
