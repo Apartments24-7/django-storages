@@ -248,7 +248,7 @@ class S3BotoStorage(Storage):
     # rolled over into a temporary file on disk. Default is 0: Do not roll over.
     max_memory_size = setting('AWS_S3_MAX_MEMORY_SIZE', 0)
 
-    def __init__(self, acl=None, bucket=None, encryption247=None, **settings):
+    def __init__(self, acl=None, bucket=None, **settings):
         # check if some of the settings we've provided as class attributes
         # need to be overwritten with values passed in here
         for name, value in settings.items():
@@ -260,8 +260,8 @@ class S3BotoStorage(Storage):
             self.default_acl = acl
         if bucket is not None:
             self.bucket_name = bucket
-        if encryption247 is not None:
-            self.encryption247 = encryption247
+
+        self.encryption247 = getattr(settings, "encryption247", False)
 
         self.location = (self.location or '').lstrip('/')
         # Backward-compatibility: given the anteriority of the SECURE_URL setting
@@ -424,11 +424,8 @@ class S3BotoStorage(Storage):
     def _save_content(self, key, content, headers):
         # only pass backwards incompatible arguments if they vary from the default
         kwargs = {}
-        if self.encryption:
-            kwargs['encrypt_key'] = self.encryption
-        if self.encryption247:
-            kwargs['encrypt_key'] = self.encryption247
-            
+        kwargs['encrypt_key'] = self.encryption or self.encryption247
+
         key.set_contents_from_file(content, headers=headers,
                                    policy=self.default_acl,
                                    reduced_redundancy=self.reduced_redundancy,
