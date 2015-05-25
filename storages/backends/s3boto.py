@@ -4,16 +4,20 @@ import mimetypes
 from gzip import GzipFile
 import datetime
 from tempfile import SpooledTemporaryFile
+import re
 
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO  # noqa
+    try:
+        from StringIO import StringIO  # noqa
+    except ImportError:
+        from io import StringIO  # noqa
 
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
-from django.utils.encoding import force_unicode, smart_str, filepath_to_uri
+from django.utils.encoding import smart_str, filepath_to_uri
 
 try:
     from boto import __version__ as boto_version
@@ -33,6 +37,8 @@ if boto_version_info[:2] < (2, 4):
     raise ImproperlyConfigured("The installed Boto library must be 2.4 or "
                                "higher.\nSee https://github.com/boto/boto")
 
+def force_unicode(text_str):
+    return re.sub('[^(\x20-\x7F)]*', '', text_str)
 
 def parse_ts_extended(ts):
     RFC1123 = '%a, %d %b %Y %H:%M:%S %Z'
@@ -57,7 +63,10 @@ def safe_join(base, *paths):
     Paths outside the base path indicate a possible security
     sensitive operation.
     """
-    from urlparse import urljoin
+    try:
+        from urlparse import urljoin
+    except ImportError:
+        from urllib.parse import urljoin
     base_path = force_unicode(base)
     base_path = base_path.rstrip('/')
     paths = [force_unicode(p) for p in paths]
