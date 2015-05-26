@@ -38,7 +38,7 @@ if boto_version_info[:2] < (2, 4):
                                "higher.\nSee https://github.com/boto/boto")
 
 def force_unicode(text_str):
-    return re.sub('[^(\x20-\x7F)]*', '', text_str)
+    return re.sub("[^(\x20-\x7F)]*", "", text_str)
 
 def parse_ts_extended(ts):
     RFC1123 = '%a, %d %b %Y %H:%M:%S %Z'
