@@ -31,6 +31,11 @@ except ImportError:
 
 from storages.utils import setting
 
+try:
+    from django.utils.deconstruct import deconstructible
+except ImportError:  # Django 1.7+ migrations
+    deconstructible = lambda klass, *args, **kwargs: klass
+
 boto_version_info = tuple([int(i) for i in boto_version.split('-')[0].split('.')])
 
 if boto_version_info[:2] < (2, 4):
@@ -86,7 +91,7 @@ def safe_join(base, *paths):
 
     return final_path.lstrip('/')
 
-
+@deconstructible
 class S3BotoStorageFile(File):
     """
     The default file object used by the S3BotoStorage backend.
@@ -207,6 +212,7 @@ class S3BotoStorageFile(File):
         self.key.close()
 
 
+@deconstructible
 class S3BotoStorage(Storage):
     """
     Amazon Simple Storage Service using Boto
