@@ -111,7 +111,7 @@ that returns an image as result.
         row = self.cursor.execute("SELECT %s from %s where %s = '%s'"%(self.fname_column,self.db_table,self.fname_column,name)).fetchone()
         return row is not None
     
-    def get_available_name(self, name):
+    def get_available_name(self, name, max_length=None):
         return name
 
     def delete(self, name):
