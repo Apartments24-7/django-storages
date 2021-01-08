@@ -510,9 +510,9 @@ class S3BotoStorage(Storage):
             query_auth=self.querystring_auth, force_http=not self.secure_urls,
             response_headers=response_headers)
 
-    def get_available_name(self, name):
+    def get_available_name(self, name, max_length=None):
         """ Overwrite existing file with the same name. """
         if self.file_overwrite:
             name = self._clean_name(name)
             return name
-        return super(S3BotoStorage, self).get_available_name(name)
+        return super(S3BotoStorage, self).get_available_name(name, max_length)
